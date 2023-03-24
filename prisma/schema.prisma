@@ -18,10 +18,80 @@ model Task {
 
 model Users {
   id String @id @db.Char(28)
-  email String
+  email String @unique
   first_name String @db.VarChar(15)
   last_name String @db.VarChar(15)
   gender String
   date_of_birth DateTime @db.Date
   phone String @db.Char(11)
+  reservations Reservations[]
+}
+
+model Flights {
+  id Int @id
+  flight String @unique
+  departure_time String
+  arrival_time String
+  price Int
+  empty_seat Empty_seats?
+  reservations Reservations[]
+}
+
+model Guests {
+  id String @id @default(uuid())
+  email String @unique
+  first_name String @db.VarChar(15)
+  last_name String @db.VarChar(15)
+  gender String
+  date_of_birth DateTime @db.Date
+  phone String @db.Char(11)
+  reservation Reservations[]
+}
+
+model Passengers {
+  id String @id
+  reservation Reservations @relation(fields: [id], references: [id])
+  first_name String @db.VarChar(15)
+  last_name String @db.VarChar(15)
+  gender String
+  date_of_birth DateTime @db.Date
+}
+
+model Payment_method {
+  id Int @id
+  status String
+  reservations Reservations?
+}
+
+model Payment_status {
+  id Int @id
+  status String
+  reservations Reservations?
+}
+
+model Reservations {
+id String @id @default(uuid())
+users Users? @relation(fields: [user_id], references: [id])
+user_id String?
+guests Guests? @relation(fields: [guest_id], references: [id])
+guest_id String?
+flight Flights @relation(fields: [flight_id], references: [id])
+flight_id Int
+flight_date DateTime @db.Date
+number_of_passenger Int
+total_price Int
+appointment_date DateTime @default(now()) @db.Timestamp(0)
+payment_method Payment_method @relation(fields: [payment_method_id], references: [id])
+payment_method_id Int @unique
+payment_status Payment_status @relation(fields: [payment_status_id], references: [id])
+payment_status_id Int @unique
+Passenger Passengers[]
+}
+
+model Empty_seats {
+  id Int @id @default(autoincrement())
+  flight Flights @relation(fields: [flight_id], references: [id])
+  flight_id Int @unique
+  stock Int
+  reserved_seat Int
 }

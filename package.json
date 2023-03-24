@@ -1,0 +1,24 @@
+{
+  "name": "backend-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayaka-111/airline-express.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ayaka-111/airline-express/issues"
+  },
+  "homepage": "https://github.com/ayaka-111/airline-express#readme"
+}

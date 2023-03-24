@@ -19,6 +19,8 @@ const prisma = new PrismaClient();
 //   return res.json(tasks);
 // });
 
+
+// Users
 // Usersテーブル全件取得
 app.get('/users', async (req, res) => {
   const users = await prisma.users.findMany();
@@ -65,5 +67,12 @@ app.post('/users', async(req, res)=> {
   });
   return res.json(newUser);
 });
+
+// Flights
+app.get('/flights', async (req, res) => {
+  const flights = await prisma.flights.findMany();
+  return res.json(flights);
+});
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
