@@ -1,9 +1,9 @@
-const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const express = require("express");
+const { PrismaClient } = require("@prisma/client");
 
 const app = express();
 const port = 3000;
-const cors = require('cors');
+const cors = require("cors");
 
 app.use(cors());
 
@@ -19,16 +19,15 @@ const prisma = new PrismaClient();
 //   return res.json(tasks);
 // });
 
-
 // Users
 // Usersテーブル全件取得
-app.get('/users', async (req, res) => {
+app.get("/users", async (req, res) => {
   const users = await prisma.users.findMany();
   return res.json(users);
 });
 
 // Usersテーブルからidを指定して取得
-app.get('/users/:id', async (req, res) => {
+app.get("/users/:id", async (req, res) => {
   // const id = Number(req.params.id);
   const id = req.params.id;
   const user = await prisma.users.findUnique({
@@ -39,21 +38,10 @@ app.get('/users/:id', async (req, res) => {
   return res.json(user);
 });
 
-// データをデータベースに追加するための処理
-// app.post('/tasks', async(req, res)=> {
-//   const {task, completed} = req.body;
-//   const newTask = await prisma.task.create({
-//     data: {
-//       task,
-//       completed,
-//     },
-//   });
-//   return res.json(newTask);
-// });
-
 // Usersテーブルに追加
-app.post('/users', async(req, res)=> {
-  const {id, email, first_name, last_name, date_of_birth, gender, phone} = req.body;
+app.post("/users", async (req, res) => {
+  const { id, email, first_name, last_name, date_of_birth, gender, phone } =
+    req.body;
   const newUser = await prisma.users.create({
     data: {
       id,
@@ -69,10 +57,48 @@ app.post('/users', async(req, res)=> {
 });
 
 // Flights
-app.get('/flights', async (req, res) => {
-  const flights = await prisma.flights.findMany();
+// to/fromが一致する便の取得
+app.get("/matchFlights", async (req, res) => {
+  const from = req.params.from;
+  const to = req.params.to;
+
+  const flights = await prisma.flights.findMany({
+    // to/fromが一致する便を取得
+    where: {
+      AND: [{ from: "羽田" }, { to: "那覇" }],
+    },
+  });
   return res.json(flights);
 });
 
+// 検索結果
+// ①reservationsとflightsを結合する→flightsと軸とした外部結合
+// ②同じ日付のデータを取得する(flight_date)
+// ③同じ行き先のデータを絞り込む(to/from)
+app.get("/searchReservations", async (req, res) => {
+  const date = req.params.flight_date;
+  const from = req.params.from;
+  const to = req.params.to;
+
+  const searchReservations = await prisma.flights.findMany({
+    where: {
+      AND: [
+        //  {flight_date: date} ,
+        //  {flight: { from: from }},
+        //  {flight: { to: to }},
+        // { flight_date: new Date("2023-04-27") },
+        // { flight: { from: "羽田" } },
+        // { flight: { to: "那覇" } },
+        { from: "羽田" },
+        { to: "那覇" },
+        { reservations: { some: { flight_date: new Date("2023-04-27") } } },
+      ],
+    },
+    include: {
+      reservations: true,
+    },
+  });
+  return res.json(searchReservations);
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

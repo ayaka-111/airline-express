@@ -30,6 +30,8 @@ model Users {
 model Flights {
   id Int @id
   flight String @unique
+  from String
+  to String
   departure_time String
   arrival_time String
   price Int
@@ -60,13 +62,13 @@ model Passengers {
 model Payment_method {
   id Int @id
   status String
-  reservations Reservations?
+  reservations Reservations[]
 }
 
 model Payment_status {
   id Int @id
   status String
-  reservations Reservations?
+  reservations Reservations[]
 }
 
 model Reservations {
@@ -82,9 +84,9 @@ number_of_passenger Int
 total_price Int
 appointment_date DateTime @default(now()) @db.Timestamp(0)
 payment_method Payment_method @relation(fields: [payment_method_id], references: [id])
-payment_method_id Int @unique
+payment_method_id Int
 payment_status Payment_status @relation(fields: [payment_status_id], references: [id])
-payment_status_id Int @unique
+payment_status_id Int
 Passenger Passengers[]
 }
 
@@ -92,6 +94,7 @@ model Empty_seats {
   id Int @id @default(autoincrement())
   flight Flights @relation(fields: [flight_id], references: [id])
   flight_id Int @unique
+  flight_date DateTime @db.Date
   stock Int
   reserved_seat Int
 }
