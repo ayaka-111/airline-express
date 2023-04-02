@@ -51,8 +51,9 @@ model Guests {
 }
 
 model Passengers {
-  id String @id
-  reservation Reservations @relation(fields: [id], references: [id])
+  id String @id @default(uuid())
+  reservation Reservations? @relation(fields: [reservation_id], references: [id])
+  reservation_id String?
   first_name String @db.VarChar(15)
   last_name String @db.VarChar(15)
   gender String
@@ -82,12 +83,12 @@ flight_id Int
 flight_date DateTime @db.Date
 number_of_passenger Int
 total_price Int
-appointment_date DateTime @default(now()) @db.Timestamp(0)
+appointment_date DateTime @db.Timestamp
 payment_method Payment_method @relation(fields: [payment_method_id], references: [id])
 payment_method_id Int
 payment_status Payment_status @relation(fields: [payment_status_id], references: [id])
 payment_status_id Int
-Passenger Passengers[]
+passengers Passengers[]
 }
 
 model Empty_seats {
