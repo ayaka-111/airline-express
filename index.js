@@ -186,6 +186,7 @@ app.put("/passengers/:id", async (req, res) => {
 });
 
 // Reservations
+// 追加
 app.post("/reservations", async (req, res) => {
   const {
     user_id,
@@ -214,6 +215,88 @@ app.post("/reservations", async (req, res) => {
     },
   });
   return res.json(newReservations);
+});
+
+// idを指定して取得
+app.get("/reservations/:id", async (req, res) => {
+  const id = req.params.id;
+  const reservation = await prisma.reservations.findUnique({
+    where: {
+      id,
+    },
+  });
+  return res.json(reservation);
+});
+
+// id指定して取得(テーブル結合)
+app.get("/joinReservations", async (req, res) => {
+  const id = req.query.id;
+  const joinReservation = await prisma.reservations.findMany({
+    where: {
+      id: id,
+    },
+    include: {
+      users: true,
+      flight: true,
+      passengers: true,
+    }
+  });
+  return res.json(joinReservation);
+});
+
+// ログインユーザーのreservationsを全件取得
+// 表示したい内容は予約者の情報、搭乗者の情報、フライトの情報、日付、人数＝reservations＋passengers+flights+users結合
+app.get("/myReservations", async (req, res) => {
+  // const date = req.query.flight_date;
+  // const from = req.query.from;
+  // const to = req.query.to;
+  const user_id = req.query.user_id;
+
+  const myReservations = await prisma.reservations.findMany({
+    where: {
+      user_id: user_id,
+    },
+    include: {
+      users: true,
+      flight: true,
+      passengers: true,
+    },
+  });
+  return res.json(myReservations);
+});
+
+app.get("/guestReservations", async (req, res) => {
+  // const user_id = req.query.user_id;
+  const flight_date =req.query.flight_date;
+  const first_name =req.query.first_name;
+  const last_name =req.query.last_name;
+  const email =req.query.email;
+
+  const guestReservations = await prisma.reservations.findMany({
+    where: {
+      AND: [
+      {flight_date: new Date(flight_date)},
+      {guests: {first_name: first_name, last_name: last_name,email: email}},
+        // //  {flight_date: date} ,
+        // //  {flight: { from: from }},
+        // //  {flight: { to: to }},
+        // // { flight_date: new Date("2023-04-27") },
+        // // { flight: { from: "羽田" } },
+        // // { flight: { to: "那覇" } },
+        // { from: from },
+        // { to: to },
+        // { reservations: { some: { flight_date: new Date(date) } } },
+      ],
+    },
+    include: {
+      guests: true,
+      flight: true,
+      passengers: true,
+      payment_method: true,
+      payment_status: true,
+    },
+  });
+  return res.json(guestReservations);
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
