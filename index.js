@@ -157,7 +157,7 @@ app.get("/passengers/:id", async (req, res) => {
 app.post("/passengers", async (req, res) => {
   const { first_name, last_name, date_of_birth, gender, reservation_id } =
     req.body;
-  const newPassenger = await prisma.passengers.create({
+  const newPassenger = await prisma.passengers.createMany({
     data: {
       first_name,
       last_name,
@@ -247,9 +247,6 @@ app.get("/joinReservations", async (req, res) => {
 // ログインユーザーのreservationsを全件取得
 // 表示したい内容は予約者の情報、搭乗者の情報、フライトの情報、日付、人数＝reservations＋passengers+flights+users結合
 app.get("/myReservations", async (req, res) => {
-  // const date = req.query.flight_date;
-  // const from = req.query.from;
-  // const to = req.query.to;
   const user_id = req.query.user_id;
 
   const myReservations = await prisma.reservations.findMany({
@@ -266,7 +263,6 @@ app.get("/myReservations", async (req, res) => {
 });
 
 app.get("/guestReservations", async (req, res) => {
-  // const user_id = req.query.user_id;
   const flight_date =req.query.flight_date;
   const first_name =req.query.first_name;
   const last_name =req.query.last_name;
@@ -277,15 +273,6 @@ app.get("/guestReservations", async (req, res) => {
       AND: [
       {flight_date: new Date(flight_date)},
       {guests: {first_name: first_name, last_name: last_name,email: email}},
-        // //  {flight_date: date} ,
-        // //  {flight: { from: from }},
-        // //  {flight: { to: to }},
-        // // { flight_date: new Date("2023-04-27") },
-        // // { flight: { from: "羽田" } },
-        // // { flight: { to: "那覇" } },
-        // { from: from },
-        // { to: to },
-        // { reservations: { some: { flight_date: new Date(date) } } },
       ],
     },
     include: {
