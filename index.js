@@ -239,6 +239,8 @@ app.get("/joinReservations", async (req, res) => {
       users: true,
       flight: true,
       passengers: true,
+      payment_method: true,
+      payment_status: true,
     }
   });
   return res.json(joinReservation);
